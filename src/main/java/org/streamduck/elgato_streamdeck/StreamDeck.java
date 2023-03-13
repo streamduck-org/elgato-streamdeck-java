@@ -1,6 +1,6 @@
 package org.streamduck.elgato_streamdeck;
 
-import org.streamduck.elgato_streamdeck.nativelib.HidApi;
+import java.util.List;
 
 /**
  * Main class of the library, holds the HIDAPI instance, only one instance should exist
@@ -21,13 +21,19 @@ public class StreamDeck {
         return instance;
     }
 
-    private final HidApi hidApi;
+    private final HidApi hidApi = new HidApi();
 
-    private StreamDeck() throws RuntimeException {
-        hidApi = new HidApi();
+    public List<DeviceDescriptor> listDevices() {
+        return StreamDeckInterface.listDevices(hidApi.getHidApiPointer());
     }
 
-//    public List<DeviceDescriptor> listDevices() {
-//
-//    }
+    public StreamDeckDevice connectToDevice(DeviceDescriptor deviceDescriptor) throws RuntimeException {
+        StreamDeckInterface deviceInterface = new StreamDeckInterface(
+                hidApi.getHidApiPointer(),
+                deviceDescriptor.kind(),
+                deviceDescriptor.serial()
+        );
+
+        return new StreamDeckDevice(deviceInterface);
+    }
 }

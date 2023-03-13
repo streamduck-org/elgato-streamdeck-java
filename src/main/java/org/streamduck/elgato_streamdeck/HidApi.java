@@ -1,9 +1,9 @@
-package org.streamduck.elgato_streamdeck.nativelib;
+package org.streamduck.elgato_streamdeck;
 
 import com.fizzed.jne.JNE;
 import com.fizzed.jne.MemoizedRunner;
 
-public class HidApi implements AutoCloseable {
+class HidApi implements AutoCloseable {
     private static final MemoizedRunner loader = new MemoizedRunner();
 
     public static void loadLibrary() {
@@ -14,9 +14,11 @@ public class HidApi implements AutoCloseable {
 
     private native static void freeHidApi(long pointer);
 
+    private final long hidApiPointer;
 
-    /** This field is being set from native library */
-    protected final long hidApiPointer;
+    protected synchronized long getHidApiPointer() {
+        return hidApiPointer;
+    }
 
     public HidApi() throws RuntimeException {
         loadLibrary();
